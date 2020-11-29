@@ -11,7 +11,7 @@ def test
   test_output_file = Tempfile.new
   test_input_file_path_csv = File.join(TEST_INPUT_PATH, TEST_TECHNIQUE)
   begin
-  #run()
+    run(TEST_TECHNIQUE, TEST_INPUT_PATH)
     puts "Difference of #{test_input_file_path_csv} and #{test_output_file.path}"
     puts `diff #{test_input_file_path_csv} #{test_output_file.path}`
   ensure
@@ -21,11 +21,23 @@ def test
 
 end
 
-def run(exercise = ARGV[0], input_path = ARGV[1])
-  exit_because_of("EXERCISE") unless exercise
+def run(technique = ARGV[0], input_path = ARGV[1])
+  exit_because_of("TECHNIQUE") unless technique
   exit_because_of("INPUT CSV FILE PATH") unless input_path
   require "csv"
-  puts "SUCCESSFUL"
+
+  technique_csv = "#{technique}.csv"
+  input_file_path_csv = File.join(File.dirname(__FILE__), input_path, technique_csv)
+  puts "INPUT FILE PATH CSV: #{input_file_path_csv}"
+  progressions = CSV.read(input_file_path_csv)
+  shuffled_routine = progressions.shuffle[1..5]
+  puts "SHUFFLED ROUTINE: #{shuffled_routine}"
+
+  CSV.open(OUTPUT_CSV_FILE_PATH, "wb") do |csv|
+    shuffled_routine.each do |progression|
+      csv << progression
+    end
+  end
 end
 
 def exit_because_of(arg_name)

@@ -22,7 +22,7 @@ def test
 end
 
 def print_usage
-  puts "Proper script execution:"
+  puts "---- Proper script execution ----"
   puts "ruby shuffle_progressions.rb INPUT_CSV_FILE_PATH TECHNIQUE [ROUTINE_COUNT]"
 end
 
@@ -34,18 +34,25 @@ def run(input_path = ARGV[0], technique = ARGV[1], routine_count = Integer(ARGV[
   technique_csv = "#{technique}.csv"
   input_file_path_csv = File.join(File.dirname(__FILE__), input_path, technique_csv)
   puts "INPUT FILE PATH CSV: #{input_file_path_csv}"
-  progressions = CSV.read(input_file_path_csv)
-  puts "ROUTINE COUNT: #{routine_count}"
-  shuffled_routine = progressions.shuffle[1..routine_count]
-  puts "SHUFFLED ROUTINE: #{shuffled_routine}"
 
-  puts "WRITING TO FILE..."
-  CSV.open(OUTPUT_CSV_FILE_PATH, "wb") do |csv|
-    shuffled_routine.each do |progression|
-      csv << progression
+  begin
+    progressions = CSV.read(input_file_path_csv)
+    puts "ROUTINE COUNT: #{routine_count}"
+    shuffled_routine = progressions.shuffle[1..routine_count]
+    puts "SHUFFLED ROUTINE: #{shuffled_routine}"
+
+    puts "WRITING TO FILE..."
+
+    CSV.open(OUTPUT_CSV_FILE_PATH, "wb") do |csv|
+      shuffled_routine.each do |progression|
+        csv << progression
+      end
     end
+  rescue SystemCallError => e
+    puts "ERROR: #{e}"
+  else
+    puts "DONE!"
   end
-  puts "DONE!"
 end
 
 def exit_because_of(arg_name)
